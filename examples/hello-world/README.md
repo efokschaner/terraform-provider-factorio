@@ -4,7 +4,7 @@
 
 ### 1. Provider
 
-The provider is not yet published so it must be built and installed locally. See [the provider readme](....\provider\README.md) for building and installing the provider.
+The provider is not yet published so it must be built and installed locally. See [the provider readme](../../provider/README.md) for building and installing the provider.
 
 ### 2. Factorio Client + Server Setup
 
