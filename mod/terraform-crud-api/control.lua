@@ -20,7 +20,7 @@ function serialize(value)
 end
 
 exports = {
-  ping = function() return "pong" end,
+  ping = function() return "\"pong\"" end,
 
   read = function(resource_type)
     return serialize(resources[resource_type].read())
