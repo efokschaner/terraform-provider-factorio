@@ -1,0 +1,9 @@
+{
+  "name": "terraform-crud-api",
+  "version": "0.0.1",
+  "title": "Terraform CRUD API for Factorio",
+  "author": "A Sense of Humour",
+  "factorio_version": "1.1",
+  "dependencies": [],
+  "description": "This mod allows HashiCorp Terraform to provision Factorio entities."
+}
