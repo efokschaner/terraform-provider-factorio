@@ -33,7 +33,7 @@ func dataSourcePlayersRead(ctx context.Context, d *schema.ResourceData, m interf
 	var diags diag.Diagnostics
 	c := m.(*factorioClient)
 	players := make([]map[string]interface{}, 0)
-	err := c.Read("players", &players)
+	err := c.Read("players", nil, &players)
 	if err != nil {
 		return diag.FromErr(err)
 	}

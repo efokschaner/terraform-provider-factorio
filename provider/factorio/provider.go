@@ -23,7 +23,9 @@ func Provider() *schema.Provider {
 				DefaultFunc: schema.EnvDefaultFunc("FACTORIO_RCON_PW", nil),
 			},
 		},
-		ResourcesMap: map[string]*schema.Resource{},
+		ResourcesMap: map[string]*schema.Resource{
+			"factorio_hello": resourceHello(),
+		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"factorio_players": dataSourcePlayers(),
 		},

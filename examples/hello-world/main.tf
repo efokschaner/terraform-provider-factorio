@@ -12,10 +12,14 @@ provider "factorio" {
   rcon_pw  = "SOMEPASSWORD"
 }
 
-
+# Example of state fetching
 data "factorio_players" "all" {}
 
-# Returns all players
 output "all_players" {
   value = data.factorio_players.all.players
+}
+
+# Example of resource creating
+resource "factorio_hello" "a-greeting" {
+  create_as_ghost = false
 }
