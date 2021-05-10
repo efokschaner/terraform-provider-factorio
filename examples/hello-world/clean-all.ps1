@@ -1,4 +1,4 @@
-& .\clean-terraform.ps1
+& .\clean-tf.ps1
 
 write-host "Removing local client mod"
 remove-item -force -recurse -ErrorAction Ignore $env:APPDATA/Factorio/mods/terraform-crud-api
