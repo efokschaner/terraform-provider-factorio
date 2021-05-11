@@ -23,6 +23,13 @@ func resourceHello() *schema.Resource {
 				Optional:    true,
 				Default:     true,
 				Description: "Used only at time of creation. Whether to create a ghost or the actual entity.",
+				// Updating this "creation-time" value necessitates re-creation
+				ForceNew: true,
+			},
+			"direction": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "east",
 			},
 		},
 	}
@@ -32,6 +39,7 @@ func resourceHelloCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	c := m.(*factorioClient)
 	create_config := make(map[string]interface{})
 	create_config["create_as_ghost"] = d.Get("create_as_ghost")
+	create_config["direction"] = d.Get("direction")
 	hello := make(map[string]interface{})
 	err := c.Create("hello", create_config, &hello)
 	if err != nil {
@@ -50,7 +58,11 @@ func resourceHelloRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.SetId(hello["id"].(string))
+	if id, exists := hello["id"]; exists {
+		d.SetId(id.(string))
+	} else {
+		d.SetId("")
+	}
 	return diags
 }
 

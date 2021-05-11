@@ -25,11 +25,11 @@ local text = {
 }
 
 
-local function create_belt(spawn_pos, create_as_ghost)
+local function create_belt(spawn_pos, create_as_ghost, direction)
   local entity_creation_params = {
     name = 'transport-belt',
     position = spawn_pos,
-    direction = defines.direction.south,
+    direction = direction,
     force = 'player',
     target = nil,
     source = nil,
@@ -53,12 +53,14 @@ end
 
 return {
   create = function(config)
+    local create_as_ghost = config.create_as_ghost == nil or config.create_as_ghost
+    local direction = defines.direction[config.direction]
     local created_entities = {}
     local spawn_pos = {x=0,y=0}
     local player = game.get_player(1)
     if player ~= nil then
-      spawn_pos.x = player.position.x + 2
-      spawn_pos.y = player.position.y
+      spawn_pos.x = player.position.x - 13
+      spawn_pos.y = player.position.y - 10
     end
     for _, word in ipairs(text) do
       for _, line in ipairs(word) do
@@ -67,7 +69,7 @@ return {
           local c = line:sub(i,i)
           if c == 'X' then
             local spawn_pos = {spawn_pos.x, spawn_pos.y}
-            local belt = create_belt(spawn_pos, config.create_as_ghost == nil or config.create_as_ghost)
+            local belt = create_belt(spawn_pos, create_as_ghost, direction)
             table.insert(created_entities, belt)
           end
           spawn_pos.x = spawn_pos.x + 1

@@ -3,13 +3,16 @@ resources = {
     read = function()
       result = {}
       for k,v in pairs(game.players) do
-        table.insert(result, {name = v.name})
+        table.insert(result, {
+          name = v.name,
+          position = v.position,
+        })
       end
       return result
     end,
   },
-
-  hello = require('resources.hello')
+  entity = require('resources.entity'),
+  hello = require('resources.hello'),
 }
 
 -- In addition to json serialization, this code also replaces empty objects with empty arrays

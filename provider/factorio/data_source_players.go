@@ -22,6 +22,22 @@ func dataSourcePlayers() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"position": &schema.Schema{
+							Type:     schema.TypeList,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"x": &schema.Schema{
+										Type:     schema.TypeFloat,
+										Computed: true,
+									},
+									"y": &schema.Schema{
+										Type:     schema.TypeFloat,
+										Computed: true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -37,6 +53,12 @@ func dataSourcePlayersRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
+	for _, player := range players {
+		// "flattening" as terraform calls it.
+		// It seems in Terraform, all nested objects are arrays of length one.
+		player["position"] = []interface{}{player["position"]}
+	}
+
 	if err := d.Set("players", players); err != nil {
 		return diag.FromErr(err)
 	}
