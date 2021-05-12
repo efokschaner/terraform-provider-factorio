@@ -33,7 +33,7 @@ func NewFactorioClient(rcon_host string, rcon_password string) (*factorioClient,
 	return c, nil
 }
 
-func (client factorioClient) DoHandShake() error {
+func (client *factorioClient) DoHandShake() error {
 	var result string
 	// Ignore the first error.
 	// Execute the ping twice in order to skip past the warning about
@@ -49,7 +49,7 @@ func (client factorioClient) DoHandShake() error {
 	return nil
 }
 
-func (client factorioClient) Read(resource_type string, query interface{}, result_out interface{}) error {
+func (client *factorioClient) Read(resource_type string, query interface{}, result_out interface{}) error {
 	query_bytes, err := json.Marshal(query)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (client factorioClient) Read(resource_type string, query interface{}, resul
 	return client.doCall(result_out, "read", resource_type, string(query_bytes))
 }
 
-func (client factorioClient) Create(resource_type string, create_config interface{}, result_out interface{}) error {
+func (client *factorioClient) Create(resource_type string, create_config interface{}, result_out interface{}) error {
 	create_config_bytes, err := json.Marshal(create_config)
 	if err != nil {
 		return err
@@ -65,16 +65,21 @@ func (client factorioClient) Create(resource_type string, create_config interfac
 	return client.doCall(result_out, "create", resource_type, string(create_config_bytes))
 }
 
-func (client factorioClient) Update(resource_type string, result_out interface{}) error {
-	return client.doCall(result_out, "update", resource_type)
+func (client *factorioClient) Update(resource_type string, resource_id string, update_config map[string]interface{}) error {
+	update_config_bytes, err := json.Marshal(update_config)
+	if err != nil {
+		return err
+	}
+	var ignore interface{}
+	return client.doCall(&ignore, "update", resource_type, resource_id, string(update_config_bytes))
 }
 
-func (client factorioClient) Delete(resource_type string) error {
-	ignore := make([]interface{}, 0)
+func (client *factorioClient) Delete(resource_type string) error {
+	var ignore interface{}
 	return client.doCall(&ignore, "delete", resource_type)
 }
 
-func (client factorioClient) doCall(result_out interface{}, params ...string) error {
+func (client *factorioClient) doCall(result_out interface{}, params ...string) error {
 	client.mutex.Lock()
 	response, err := client.conn.Execute(formatRconCommand(params))
 	client.mutex.Unlock()

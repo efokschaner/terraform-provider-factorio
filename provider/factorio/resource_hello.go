@@ -67,6 +67,18 @@ func resourceHelloRead(ctx context.Context, d *schema.ResourceData, m interface{
 }
 
 func resourceHelloUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	c := m.(*factorioClient)
+	hello_updates := make(map[string]interface{})
+	if d.HasChange("direction") {
+		hello_updates["direction"] = d.Get("direction")
+	}
+	err := c.Update(
+		"hello",
+		d.Id(),
+		hello_updates)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return resourceHelloRead(ctx, d, m)
 }
 

@@ -40,7 +40,9 @@ exports = {
     return serialize(resources[resource_type].create(create_config))
   end,
 
-  update = function(resource_type)
+  update = function(resource_type, resource_id, update_config_string)
+    local update_config = game.json_to_table(update_config_string)
+    return serialize(resources[resource_type].update(resource_id, update_config))
   end,
 
   delete = function(resource_type)

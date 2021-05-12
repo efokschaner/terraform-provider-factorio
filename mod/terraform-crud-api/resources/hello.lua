@@ -93,5 +93,18 @@ return {
     return {
       id = tostring(entities[1].unit_number),
     }
-  end
+  end,
+
+  update = function(resource_id, update_config)
+    local belts = resource_db.get("hello", tonumber(resource_id))
+    if belts == nil then
+      return nil
+    end
+    if update_config.direction then
+      for _, belt in ipairs(belts) do
+        belt.direction = defines.direction[update_config.direction]
+      end
+    end
+    return nil
+  end,
 }
