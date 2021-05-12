@@ -45,7 +45,8 @@ exports = {
     return serialize(resources[resource_type].update(resource_id, update_config))
   end,
 
-  delete = function(resource_type)
+  delete = function(resource_type, resource_id)
+    return serialize(resources[resource_type].delete(resource_id))
   end,
 }
 

@@ -85,8 +85,11 @@ func resourceHelloUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 }
 
 func resourceHelloDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	// Warning or errors can be collected in a slice type
+	c := m.(*factorioClient)
 	var diags diag.Diagnostics
-
+	err := c.Delete("hello", d.Id())
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return diags
 }

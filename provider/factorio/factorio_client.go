@@ -74,9 +74,20 @@ func (client *factorioClient) Update(resource_type string, resource_id string, u
 	return client.doCall(&ignore, "update", resource_type, resource_id, string(update_config_bytes))
 }
 
-func (client *factorioClient) Delete(resource_type string) error {
-	var ignore interface{}
-	return client.doCall(&ignore, "delete", resource_type)
+func (client *factorioClient) Delete(resource_type string, resource_id string) error {
+	result := struct {
+		IsDeleted bool `json:"is_deleted"`
+	}{
+		IsDeleted: false,
+	}
+	err := client.doCall(&result, "delete", resource_type, resource_id)
+	if err != nil {
+		return err
+	}
+	if !result.IsDeleted {
+		return fmt.Errorf("reportedly failed to delete")
+	}
+	return nil
 }
 
 func (client *factorioClient) doCall(result_out interface{}, params ...string) error {

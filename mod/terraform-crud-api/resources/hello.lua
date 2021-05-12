@@ -117,4 +117,23 @@ return {
     end
     return nil
   end,
+
+  delete = function(resource_id)
+    local belts = resource_db.get('hello', tonumber(resource_id))
+    if belts == nil then
+      return {
+        is_deleted = true
+      }
+    end
+    local all_succeeded = true
+    for _, belt in ipairs(belts) do
+      all_succeeded = all_succeeded and belt.destroy()
+    end
+    if all_succeeded then
+      resource_db.put('hello', tonumber(resource_id), nil)
+    end
+    return {
+      is_deleted = all_succeeded
+    }
+  end,
 }

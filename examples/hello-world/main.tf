@@ -22,4 +22,5 @@ output "all_players" {
 # Example of resource creating
 resource "factorio_hello" "a-greeting" {
   create_as_ghost = false
+  direction = "east"
 }
