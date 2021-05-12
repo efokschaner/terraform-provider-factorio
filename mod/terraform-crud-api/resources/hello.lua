@@ -95,13 +95,23 @@ return {
   end,
 
   read = function(query)
-    local entities = resource_db.get("hello", tonumber(query.id))
-    if entities == nil then
+    local belts = resource_db.get("hello", tonumber(query.id))
+    if belts == nil then
+      return nil
+    end
+    local first_valid_entity = nil
+    for _, belt in ipairs(belts) do
+      if belt.valid then
+        first_valid_entity = belt
+        break
+      end
+    end
+    if first_valid_entity == nil then
       return nil
     end
     return {
-      id = tostring(entities[1].unit_number),
-      direction = direction_to_string[entities[1].direction],
+      id = query.id,
+      direction = direction_to_string[first_valid_entity.direction],
     }
   end,
 
@@ -112,7 +122,9 @@ return {
     end
     if update_config.direction then
       for _, belt in ipairs(belts) do
-        belt.direction = defines.direction[update_config.direction]
+        if belt.valid then
+          belt.direction = defines.direction[update_config.direction]
+        end
       end
     end
     return nil
