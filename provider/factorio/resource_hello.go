@@ -58,11 +58,13 @@ func resourceHelloRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if id, exists := hello["id"]; exists {
-		d.SetId(id.(string))
-	} else {
+	id, id_exists := hello["id"]
+	if !id_exists {
 		d.SetId("")
+		return diags
 	}
+	d.SetId(id.(string))
+	d.Set("direction", hello["direction"])
 	return diags
 }
 

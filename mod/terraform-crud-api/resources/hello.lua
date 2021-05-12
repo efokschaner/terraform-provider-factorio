@@ -24,6 +24,15 @@ local text = {
   },
 }
 
+local function table_invert(t)
+  local s={}
+  for k,v in pairs(t) do
+    s[v]=k
+  end
+  return s
+end
+
+local direction_to_string = table_invert(defines.direction)
 
 local function create_belt(spawn_pos, create_as_ghost, direction)
   local entity_creation_params = {
@@ -92,6 +101,7 @@ return {
     end
     return {
       id = tostring(entities[1].unit_number),
+      direction = direction_to_string[entities[1].direction],
     }
   end,
 
