@@ -11,12 +11,12 @@ import (
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"rcon_host": &schema.Schema{
+			"rcon_host": {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("FACTORIO_RCON_HOST", nil),
 			},
-			"rcon_pw": &schema.Schema{
+			"rcon_pw": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Sensitive:   true,

@@ -13,25 +13,25 @@ func dataSourcePlayers() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourcePlayersRead,
 		Schema: map[string]*schema.Schema{
-			"players": &schema.Schema{
+			"players": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"name": &schema.Schema{
+						"name": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"position": &schema.Schema{
+						"position": {
 							Type:     schema.TypeList,
 							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"x": &schema.Schema{
+									"x": {
 										Type:     schema.TypeFloat,
 										Computed: true,
 									},
-									"y": &schema.Schema{
+									"y": {
 										Type:     schema.TypeFloat,
 										Computed: true,
 									},

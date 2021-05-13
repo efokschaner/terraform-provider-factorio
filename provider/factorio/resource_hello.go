@@ -14,11 +14,11 @@ func resourceHello() *schema.Resource {
 		UpdateContext: resourceHelloUpdate,
 		DeleteContext: resourceHelloDelete,
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"create_as_ghost": &schema.Schema{
+			"create_as_ghost": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     true,
@@ -26,7 +26,7 @@ func resourceHello() *schema.Resource {
 				// Updating this "creation-time" value necessitates re-creation
 				ForceNew: true,
 			},
-			"direction": &schema.Schema{
+			"direction": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "east",
