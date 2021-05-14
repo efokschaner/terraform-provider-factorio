@@ -50,7 +50,44 @@ exports = {
   end,
 }
 
-remote.add_interface('terraform-crud-api', exports)
+local function call(request_string)
+  local deserialize_succeeded, deserialize_result = xpcall(
+    game.json_to_table,
+    debug.traceback,
+    request_string)
+  if !deserialize_succeeded then
+    return {
+      error = {
+        code = 400,
+        message = 'Failed to deserialize request_string',
+        data = deserialize_result
+      }
+    }
+  end
+  local method = exports[request.method]
+  if method = nil then
+    return {
+      error = {
+        code = 404,
+        message = string.format('No method named "%s"', request.method),
+      }
+    }
+  end
+  local method_succeeded, result = xpcall(method, debug.traceback, table.unpack(request.params))
+  if succeeded then
+    return {
+      result = result
+    }
+  end
+
+  local result = exports[request.method]()
+
+
+
+  return serialize()
+end
+
+remote.add_interface('terraform-crud-api', {call = call})
 
 script.on_init(function()
   global.resource_db = {}

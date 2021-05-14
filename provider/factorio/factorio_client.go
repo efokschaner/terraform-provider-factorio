@@ -90,28 +90,43 @@ func (client *factorioClient) Delete(resource_type string, resource_id string) e
 	return nil
 }
 
-func (client *factorioClient) doCall(result_out interface{}, params ...string) error {
+type RpcRequest struct {
+	Method string        `json:"method"`
+	Params []interface{} `json:"params"`
+}
+
+type RpcResponse struct {
+	Result *json.RawMessage `json:"result"`
+	Error  interface{}      `json:"error"`
+}
+
+func (client *factorioClient) doCall(result interface{}, method string, params ...interface{}) error {
+	req := RpcRequest{
+		Method: method,
+		Params: params,
+	}
+	request_bytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+	// Use single quotes around request_bytes
+	// to avoid conflict with json double quotes
+	// TODO: Escape single quotes in request_bytes
+	command := fmt.Sprintf("/c rcon.print(remote.call('terraform-crud-api', '%s'", request_bytes)
 	client.mutex.Lock()
-	response, err := client.conn.Execute(formatRconCommand(params))
+	executeResponse, err := client.conn.Execute(command)
 	client.mutex.Unlock()
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal([]byte(response.Body), result_out)
+	var response RpcResponse
+	err = json.Unmarshal([]byte(executeResponse.Body), &response)
 	if err != nil {
-		err = fmt.Errorf("unmarshalling \"%v\": %v", response.Body, err)
+		return fmt.Errorf("unmarshalling \"%v\": %v", executeResponse.Body, err)
 	}
-	return err
-}
+	if response.Error != nil {
+		return fmt.Errorf("error from api: %+v", response.Error)
+	}
 
-func formatRconCommand(params []string) string {
-	// TODO: Replace the api with something a bit more jsonrpc-ish
-	// to simplify method / param / response delivery
-	result := "/c rcon.print(remote.call(\"terraform-crud-api\""
-	for _, p := range params {
-		// Use single quotes to avoid conflict with json double quotes
-		result += ",'" + p + "'"
-	}
-	result += "))"
-	return result
+	return err
 }
