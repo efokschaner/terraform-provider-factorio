@@ -1,5 +1,5 @@
-remove-item -force -recurse $env:APPDATA/Factorio/mods/terraform-crud-api -ErrorAction Ignore
-remove-item -force -recurse factorio-volume -ErrorAction Ignore
+
+& $PSScriptRoot\clean-all.ps1
 
 # Copy the mod to your client mods folder
 cp -r ../../mod/terraform-crud-api $env:APPDATA/Factorio/mods
