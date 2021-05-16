@@ -8,7 +8,7 @@ The provider is not yet published so it must be built and installed locally. See
 
 ### 2. Factorio Client + Server Setup
 
-Run `.\run.ps1`. It installs the mod to the current machine's Factorio client mods and sets up a headless factorio server, also running the mod.
+Run `./scripts/run.ps1`. It installs the mod to the current machine's Factorio client mods and sets up a headless factorio server, also running the mod.
 
 ### 3. Terraform Run
 
@@ -24,5 +24,5 @@ terraform apply -auto-approve
 
 To wipe files created by the above operations you can use:
 
-- `clean-tf.ps1`: Deletes just the terraform state.
-- `clean-all.ps1`: Deletes the server state, and also removes the mod from your own Factorio client install.
+- `scripts/clean-tf.ps1`: Deletes just the terraform state.
+- `scripts/clean-all.ps1`: Deletes the server state, and also removes the mod from your own Factorio client install.
