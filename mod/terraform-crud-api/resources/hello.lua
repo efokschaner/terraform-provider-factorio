@@ -64,6 +64,9 @@ return {
   create = function(config)
     local create_as_ghost = config.create_as_ghost == nil or config.create_as_ghost
     local direction = defines.direction[config.direction]
+    if direction == nil then
+      error(string.format('Expected valid direction but got "%s"', config.direction))
+    end
     local created_entities = {}
     local spawn_pos = {x=0,y=0}
     local player = game.get_player(1)
@@ -134,7 +137,7 @@ return {
     local belts = resource_db.get('hello', tonumber(resource_id))
     if belts == nil then
       return {
-        is_deleted = true
+        resource_exists = false
       }
     end
     local all_succeeded = true
@@ -145,7 +148,7 @@ return {
       resource_db.put('hello', tonumber(resource_id), nil)
     end
     return {
-      is_deleted = all_succeeded
+      resource_exists = not all_succeeded
     }
   end,
 }

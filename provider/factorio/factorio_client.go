@@ -50,42 +50,29 @@ func (client *factorioClient) DoHandShake() error {
 }
 
 func (client *factorioClient) Read(resource_type string, query interface{}, result_out interface{}) error {
-	query_bytes, err := json.Marshal(query)
-	if err != nil {
-		return err
-	}
-	return client.doCall(result_out, "read", resource_type, string(query_bytes))
+	return client.doCall(result_out, "read", resource_type, query)
 }
 
 func (client *factorioClient) Create(resource_type string, create_config interface{}, result_out interface{}) error {
-	create_config_bytes, err := json.Marshal(create_config)
-	if err != nil {
-		return err
-	}
-	return client.doCall(result_out, "create", resource_type, string(create_config_bytes))
+	return client.doCall(result_out, "create", resource_type, create_config)
 }
 
 func (client *factorioClient) Update(resource_type string, resource_id string, update_config map[string]interface{}) error {
-	update_config_bytes, err := json.Marshal(update_config)
-	if err != nil {
-		return err
-	}
-	var ignore interface{}
-	return client.doCall(&ignore, "update", resource_type, resource_id, string(update_config_bytes))
+	return client.doCall(nil, "update", resource_type, resource_id, update_config)
 }
 
 func (client *factorioClient) Delete(resource_type string, resource_id string) error {
 	result := struct {
-		IsDeleted bool `json:"is_deleted"`
+		ResourceExists bool `json:"resource_exists"`
 	}{
-		IsDeleted: false,
+		ResourceExists: true,
 	}
 	err := client.doCall(&result, "delete", resource_type, resource_id)
 	if err != nil {
 		return err
 	}
-	if !result.IsDeleted {
-		return fmt.Errorf("reportedly failed to delete")
+	if result.ResourceExists {
+		return fmt.Errorf("resource still exists")
 	}
 	return nil
 }
@@ -95,12 +82,21 @@ type RpcRequest struct {
 	Params []interface{} `json:"params"`
 }
 
+type RpcError struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
+
 type RpcResponse struct {
 	Result *json.RawMessage `json:"result"`
-	Error  interface{}      `json:"error"`
+	Error  *RpcError        `json:"error"`
 }
 
 func (client *factorioClient) doCall(result interface{}, method string, params ...interface{}) error {
+	if params == nil {
+		params = []interface{}{}
+	}
 	req := RpcRequest{
 		Method: method,
 		Params: params,
@@ -112,7 +108,7 @@ func (client *factorioClient) doCall(result interface{}, method string, params .
 	// Use single quotes around request_bytes
 	// to avoid conflict with json double quotes
 	// TODO: Escape single quotes in request_bytes
-	command := fmt.Sprintf("/c rcon.print(remote.call('terraform-crud-api', '%s'", request_bytes)
+	command := fmt.Sprintf("/c rcon.print(remote.call('terraform-crud-api', 'call', '%s'))", request_bytes)
 	client.mutex.Lock()
 	executeResponse, err := client.conn.Execute(command)
 	client.mutex.Unlock()
@@ -125,8 +121,14 @@ func (client *factorioClient) doCall(result interface{}, method string, params .
 		return fmt.Errorf("unmarshalling \"%v\": %v", executeResponse.Body, err)
 	}
 	if response.Error != nil {
-		return fmt.Errorf("error from api: %+v", response.Error)
+		return fmt.Errorf(
+			"error from api, code: %d, message: \"%s\", details: %+v",
+			response.Error.Code,
+			response.Error.Message,
+			response.Error.Data)
 	}
-
-	return err
+	if response.Result == nil {
+		return nil
+	}
+	return json.Unmarshal(*response.Result, result)
 }
