@@ -1,10 +1,12 @@
-package factorio
+package internal
 
 import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"terraform-provider-factorio/client"
 )
 
 // Provider -
@@ -24,7 +26,8 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"factorio_hello": resourceHello(),
+			"factorio_entity": resourceEntity(),
+			"factorio_hello":  resourceHello(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"factorio_players": dataSourcePlayers(),
@@ -42,7 +45,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	if rcon_pw == "" {
 		return nil, diag.Errorf("rcon_pw was empty")
 	}
-	client, err := NewFactorioClient(rcon_host, rcon_pw)
+	client, err := client.NewFactorioClient(rcon_host, rcon_pw)
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}

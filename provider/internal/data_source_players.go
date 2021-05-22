@@ -1,4 +1,4 @@
-package factorio
+package internal
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"terraform-provider-factorio/client"
 )
 
 func dataSourcePlayers() *schema.Resource {
@@ -22,22 +24,9 @@ func dataSourcePlayers() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"position": {
-							Type:     schema.TypeList,
+						"position": positionSchema(&schema.Schema{
 							Computed: true,
-							Elem: &schema.Resource{
-								Schema: map[string]*schema.Schema{
-									"x": {
-										Type:     schema.TypeFloat,
-										Computed: true,
-									},
-									"y": {
-										Type:     schema.TypeFloat,
-										Computed: true,
-									},
-								},
-							},
-						},
+						}),
 					},
 				},
 			},
@@ -47,7 +36,7 @@ func dataSourcePlayers() *schema.Resource {
 
 func dataSourcePlayersRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	c := m.(*factorioClient)
+	c := m.(*client.FactorioClient)
 	players := make([]map[string]interface{}, 0)
 	err := c.Read("players", nil, &players)
 	if err != nil {

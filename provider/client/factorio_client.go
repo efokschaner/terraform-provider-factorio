@@ -1,4 +1,4 @@
-package factorio
+package client
 
 import (
 	"encoding/json"
@@ -8,14 +8,14 @@ import (
 	rcon "github.com/gtaylor/factorio-rcon"
 )
 
-type factorioClient struct {
+type FactorioClient struct {
 	conn *rcon.RCON
 	// rcon.RCON is not threadsafe, quick and dirty mutex
 	// TODO rewrite RCON to handle parallel / interleaved calls
 	mutex sync.Mutex
 }
 
-func NewFactorioClient(rcon_host string, rcon_password string) (*factorioClient, error) {
+func NewFactorioClient(rcon_host string, rcon_password string) (*FactorioClient, error) {
 	r, err := rcon.Dial(rcon_host)
 	if err != nil {
 		return nil, err
@@ -24,16 +24,16 @@ func NewFactorioClient(rcon_host string, rcon_password string) (*factorioClient,
 	if err != nil {
 		return nil, err
 	}
-	c := new(factorioClient)
+	var c FactorioClient
 	c.conn = r
 	err = c.DoHandShake()
 	if err != nil {
 		return nil, err
 	}
-	return c, nil
+	return &c, nil
 }
 
-func (client *factorioClient) DoHandShake() error {
+func (client *FactorioClient) DoHandShake() error {
 	var result string
 	// Ignore the first error.
 	// Execute the ping twice in order to skip past the warning about
@@ -49,19 +49,20 @@ func (client *factorioClient) DoHandShake() error {
 	return nil
 }
 
-func (client *factorioClient) Read(resource_type string, query interface{}, result_out interface{}) error {
+func (client *FactorioClient) Read(resource_type string, query interface{}, result_out interface{}) error {
 	return client.doCall(result_out, "read", resource_type, query)
 }
 
-func (client *factorioClient) Create(resource_type string, create_config interface{}, result_out interface{}) error {
+func (client *FactorioClient) Create(resource_type string, create_config interface{}, result_out interface{}) error {
 	return client.doCall(result_out, "create", resource_type, create_config)
 }
 
-func (client *factorioClient) Update(resource_type string, resource_id string, update_config map[string]interface{}) error {
-	return client.doCall(nil, "update", resource_type, resource_id, update_config)
+// Perhaps Update should just return success / failure?
+func (client *FactorioClient) Update(resource_type string, resource_id string, update_opts interface{}, result_out interface{}) error {
+	return client.doCall(result_out, "update", resource_type, resource_id, update_opts)
 }
 
-func (client *factorioClient) Delete(resource_type string, resource_id string) error {
+func (client *FactorioClient) Delete(resource_type string, resource_id string) error {
 	result := struct {
 		ResourceExists bool `json:"resource_exists"`
 	}{
@@ -93,7 +94,7 @@ type RpcResponse struct {
 	Error  *RpcError        `json:"error"`
 }
 
-func (client *factorioClient) doCall(result interface{}, method string, params ...interface{}) error {
+func (client *FactorioClient) doCall(result interface{}, method string, params ...interface{}) error {
 	if params == nil {
 		params = []interface{}{}
 	}
@@ -127,8 +128,11 @@ func (client *factorioClient) doCall(result interface{}, method string, params .
 			response.Error.Message,
 			response.Error.Data)
 	}
+	// Lua nil does not get serialized to null, so a missing Result
+	// is interpreted as a null Result
 	if response.Result == nil {
-		return nil
+		null := json.RawMessage("null")
+		response.Result = &null
 	}
 	return json.Unmarshal(*response.Result, result)
 }

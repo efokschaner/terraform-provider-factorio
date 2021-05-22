@@ -1,10 +1,12 @@
-package factorio
+package internal
 
 import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+
+	"terraform-provider-factorio/client"
 )
 
 func resourceHello() *schema.Resource {
@@ -13,6 +15,7 @@ func resourceHello() *schema.Resource {
 		ReadContext:   resourceHelloRead,
 		UpdateContext: resourceHelloUpdate,
 		DeleteContext: resourceHelloDelete,
+		Description:   "A message made of conveyor belts. Not very useful.",
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Type:     schema.TypeString,
@@ -26,17 +29,16 @@ func resourceHello() *schema.Resource {
 				// Updating this "creation-time" value necessitates re-creation
 				ForceNew: true,
 			},
-			"direction": {
-				Type:     schema.TypeString,
+			"direction": directionSchema(&schema.Schema{
 				Optional: true,
 				Default:  "east",
-			},
+			}),
 		},
 	}
 }
 
 func resourceHelloCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*factorioClient)
+	c := m.(*client.FactorioClient)
 	create_config := make(map[string]interface{})
 	create_config["create_as_ghost"] = d.Get("create_as_ghost")
 	create_config["direction"] = d.Get("direction")
@@ -52,7 +54,7 @@ func resourceHelloCreate(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceHelloRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
-	c := m.(*factorioClient)
+	c := m.(*client.FactorioClient)
 	hello := make(map[string]interface{})
 	err := c.Read("hello", map[string]interface{}{"id": d.Id()}, &hello)
 	if err != nil {
@@ -69,7 +71,7 @@ func resourceHelloRead(ctx context.Context, d *schema.ResourceData, m interface{
 }
 
 func resourceHelloUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*factorioClient)
+	c := m.(*client.FactorioClient)
 	hello_updates := make(map[string]interface{})
 	if d.HasChange("direction") {
 		hello_updates["direction"] = d.Get("direction")
@@ -77,7 +79,8 @@ func resourceHelloUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	err := c.Update(
 		"hello",
 		d.Id(),
-		hello_updates)
+		hello_updates,
+		nil)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -85,7 +88,7 @@ func resourceHelloUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 }
 
 func resourceHelloDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*factorioClient)
+	c := m.(*client.FactorioClient)
 	var diags diag.Diagnostics
 	err := c.Delete("hello", d.Id())
 	if err != nil {
