@@ -64,6 +64,11 @@ return {
       move_stuck_players = true,
       item = nil,
     }
+    if config.entity_specific_parameters ~= nil then
+      for k,v in pairs(config.entity_specific_parameters) do
+        entity_creation_params[k] = v
+      end
+    end
     local e = surface.create_entity(entity_creation_params)
     if e == nil then
       error(string.format('Failed to create "%s"', config.name))

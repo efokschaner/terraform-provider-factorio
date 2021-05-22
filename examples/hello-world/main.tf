@@ -27,6 +27,22 @@ resource "factorio_entity" "a-furnace" {
     x = 1
     y = 2
   }
-  direction = "east"
+  direction = "north"
   force = "player"
+}
+
+# Creating a ghost, requires entity_specific_parameters
+resource "factorio_entity" "a-ghost-furnace" {
+  surface = "nauvis"
+  name = "entity-ghost"
+  position {
+    x = 3
+    y = 2
+  }
+  direction = "north"
+  force = "player"
+  entity_specific_parameters = {
+    inner_name = "stone-furnace"
+    expires = false
+  }
 }

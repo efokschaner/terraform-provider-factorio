@@ -42,11 +42,12 @@ func (client *FactorioClient) EntityGet(unitNumber UnitNumber) (*Entity, error) 
 
 // Corresponding to https://lua-api.factorio.com/latest/LuaSurface.html#LuaSurface.create_entity
 type EntityCreateOptions struct {
-	Surface   string    `json:"surface"` // eg. "nauvis"
-	Name      string    `json:"name"`
-	Position  Position  `json:"position"`
-	Direction Direction `json:"direction"`
-	Force     string    `json:"force"` // eg. "player", "enemy", "neutral"
+	Surface                  string                 `json:"surface"` // eg. "nauvis"
+	Name                     string                 `json:"name"`
+	Position                 Position               `json:"position"`
+	Direction                Direction              `json:"direction"`
+	Force                    string                 `json:"force"` // eg. "player", "enemy", "neutral"
+	EntitySpecificParameters map[string]interface{} `json:"entity_specific_parameters"`
 
 	// Unimplemented
 	/*

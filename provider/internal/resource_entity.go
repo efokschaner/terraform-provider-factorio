@@ -54,6 +54,13 @@ func resourceEntity() *schema.Resource {
 				Default:     "player",
 				Description: "The force of this LuaEntity, eg. \"player\", \"enemy\", \"neutral\" (https://lua-api.factorio.com/latest/LuaControl.html#LuaControl.force)",
 			},
+			"entity_specific_parameters": {
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "A map of additional entity-specific parameters to be passed to create_entity (https://lua-api.factorio.com/latest/LuaSurface.html#LuaSurface.create_entity)",
+				ForceNew:    true,
+			},
 		},
 	}
 }
@@ -73,6 +80,7 @@ func resourceEntityCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	opts.Position.Y = float32(d.Get("position.0.y").(float64))
 	opts.Direction = direction
 	opts.Force = d.Get("force").(string)
+	opts.EntitySpecificParameters = d.Get("entity_specific_parameters").(map[string]interface{})
 
 	e, err := c.EntityCreate(&opts)
 	if err != nil {
