@@ -15,10 +15,6 @@ provider "factorio" {
 # Example of state fetching
 data "factorio_players" "all" {}
 
-output "all_players" {
-  value = data.factorio_players.all.players
-}
-
 # Example of resource creating
 resource "factorio_entity" "a-furnace" {
   surface = "nauvis"
@@ -45,4 +41,15 @@ resource "factorio_entity" "a-ghost-furnace" {
     inner_name = "stone-furnace"
     expires = false
   }
+}
+
+// Example of using a Factorio infrastructure module
+module "hello" {
+  count = length(data.factorio_players.all.players)
+  source = "./modules/hello"
+  position = {
+    x = data.factorio_players.all.players[count.index].position.0.x
+    y = data.factorio_players.all.players[count.index].position.0.y
+  }
+  direction = "east"
 }
