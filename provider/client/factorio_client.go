@@ -3,20 +3,14 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"sync"
-
-	rcon "github.com/gtaylor/factorio-rcon"
 )
 
 type FactorioClient struct {
-	conn *rcon.RCON
-	// rcon.RCON is not threadsafe, quick and dirty mutex
-	// TODO rewrite RCON to handle parallel / interleaved calls
-	mutex sync.Mutex
+	conn *RCON
 }
 
 func NewFactorioClient(rcon_host string, rcon_password string) (*FactorioClient, error) {
-	r, err := rcon.Dial(rcon_host)
+	r, err := Dial(rcon_host)
 	if err != nil {
 		return nil, err
 	}
@@ -110,16 +104,14 @@ func (client *FactorioClient) doCall(result interface{}, method string, params .
 	// to avoid conflict with json double quotes
 	// TODO: Escape single quotes in request_bytes
 	command := fmt.Sprintf("/silent-command rcon.print(remote.call('terraform-crud-api', 'call', '%s'))", request_bytes)
-	client.mutex.Lock()
 	executeResponse, err := client.conn.Execute(command)
-	client.mutex.Unlock()
 	if err != nil {
 		return err
 	}
 	var response RpcResponse
-	err = json.Unmarshal([]byte(executeResponse.Body), &response)
+	err = json.Unmarshal([]byte(executeResponse), &response)
 	if err != nil {
-		return fmt.Errorf("unmarshalling \"%v\": %v", executeResponse.Body, err)
+		return fmt.Errorf("unmarshalling \"%v\": %v", executeResponse, err)
 	}
 	if response.Error != nil {
 		return fmt.Errorf(
