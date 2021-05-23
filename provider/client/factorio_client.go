@@ -109,7 +109,7 @@ func (client *FactorioClient) doCall(result interface{}, method string, params .
 	// Use single quotes around request_bytes
 	// to avoid conflict with json double quotes
 	// TODO: Escape single quotes in request_bytes
-	command := fmt.Sprintf("/c rcon.print(remote.call('terraform-crud-api', 'call', '%s'))", request_bytes)
+	command := fmt.Sprintf("/silent-command rcon.print(remote.call('terraform-crud-api', 'call', '%s'))", request_bytes)
 	client.mutex.Lock()
 	executeResponse, err := client.conn.Execute(command)
 	client.mutex.Unlock()

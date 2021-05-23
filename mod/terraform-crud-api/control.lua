@@ -116,8 +116,9 @@ local function call_and_handle_unhandled_errors(request_string)
 end
 
 local function call(request_string)
+  print(string.format('terraform-crud-api REQUEST: %s', request_string))
   local response = call_and_handle_unhandled_errors(request_string)
-  print(string.format('terraform-crud-api response: %s', response))
+  print(string.format('terraform-crud-api RESPONSE: %s', response))
   return response
 end
 
