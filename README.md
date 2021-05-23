@@ -4,7 +4,7 @@
 
 TODO: Add gifs.
 
-_Current Status:_ Barely functional and entirely useless.
+_Current Status:_ Barely functional and mostly useless.
 
 Inspired by the likes of:
 
