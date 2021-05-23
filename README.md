@@ -2,7 +2,7 @@
 
 "Infrastructure as Code" for your factory.
 
-TODO: Add gifs.
+https://user-images.githubusercontent.com/1409112/119280384-0a067680-bbe6-11eb-8610-10a3f5a9eeb5.mp4
 
 _Current Status:_ Barely functional and mostly useless.
 
