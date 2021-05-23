@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"math"
 	"strconv"
 	"terraform-provider-factorio/client"
 
@@ -10,7 +11,7 @@ import (
 func shouldSuppressDiffPosition(k, old, new string, d *schema.ResourceData) bool {
 	oldF, _ := strconv.ParseFloat(old, 64)
 	newF, _ := strconv.ParseFloat(new, 64)
-	return int64(oldF) == int64(newF)
+	return int64(math.Floor(oldF)) == int64(math.Floor(newF))
 }
 
 func integerPositionSchema(base *schema.Schema) *schema.Schema {
