@@ -9,7 +9,7 @@ terraform {
 
 locals {
   // Offsets place the text with the center
-  offset_x = -12
+  offset_x = -23
   offset_y = -10
   text = [
     [
