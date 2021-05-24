@@ -4,7 +4,8 @@
 
 ### 1. Provider
 
-The provider is not yet published so it must be built and installed locally. See [the provider readme](../../provider/README.md) for building and installing the provider.
+The provider is automatically downloaded from the [Terraform registry](https://registry.terraform.io/providers/efokschaner/factorio/latest).
+If you wish to use a locally built version see [the provider readme](../../provider/README.md) for building from source and installing the provider.
 
 ### 2. Factorio Client + Server Setup
 
