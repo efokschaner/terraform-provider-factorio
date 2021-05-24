@@ -17,12 +17,14 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("FACTORIO_RCON_HOST", nil),
+				Description: "The hostname and port for RCON on the Factorio server",
 			},
 			"rcon_pw": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Sensitive:   true,
 				DefaultFunc: schema.EnvDefaultFunc("FACTORIO_RCON_PW", nil),
+				Description: "The password for RCON on the Factorio server",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
